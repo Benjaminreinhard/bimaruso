@@ -1,0 +1,11 @@
+build/
+dist/
+.env/
+env/
+
+.DS_Store
+ .vscode/
+*.swp
+*.vim
+
+/other/
