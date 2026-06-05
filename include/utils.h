@@ -3,6 +3,33 @@
 
 #include <stdbool.h>
 
+#define D '.'
+#define W 'w'
+#define S 's'
+#define R 'r'
+#define T 't'
+#define L 'l'
+#define B 'b'
+#define M 'm'
+
+#define HASH '#'
+#define COMMA ','
+#define COLON ':'
+
+#define ZERO '0'
+#define ONE '1'
+#define TWO '2'
+#define THREE '3'
+#define FOUR '4'
+#define FIVE '5'
+#define SIX '6'
+#define SEVEN '7'
+#define EIGHT '8'
+#define NINE '9'
+
+#define O 'o'
+#define X 'x'
+
 void printi(const int i);
 void printc(const char c);
 

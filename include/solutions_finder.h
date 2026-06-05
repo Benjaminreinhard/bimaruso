@@ -1,9 +1,8 @@
 #ifndef SOLUTIONS_FINDER_H
 #define SOLUTIONS_FINDER_H
 
-#include "input_parser.h"
+#include "parsed_input_processor.h"
 
-void find_solutions(ParsedInput in);
+void find_solutions(State s);
 
 #endif
-

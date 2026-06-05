@@ -159,21 +159,21 @@ int calc_str_length(const char* str) {
 
 void cell_symbol(const char cell) {
 	switch (cell) {
-		case '.':
+		case D:
 			printf("%s ", " "); break; // Choose \u00B7 for center dot
-		case 'w':
+		case W:
 			printf("%s ", "\u223F"); break;
-		case 's':
+		case S:
 			printf("%s ", "\u25C6"); break;
-		case 'r':
+		case R:
 			printf("%s ", "\u25B6"); break;
-		case 'u':
+		case T:
 			printf("%s ", "\u25B2"); break;
-		case 'l':
+		case L:
 			printf("%s ", "\u25C0"); break;
-		case 'd':
+		case B:
 			printf("%s ", "\u25BC"); break;
-		case 'c':
+		case M:
 			printf("%s ", "\u25FC"); break;
 		}
 }
