@@ -10,7 +10,7 @@ typedef struct {
 	const int* rownums;
 	const int* colnums;
 	const int shipcounts_length;
-	const int** shipcounts;
+	const int* shipcounts;
 } ParsedInput;
 
 ParsedInput parse_input(FILE* file);

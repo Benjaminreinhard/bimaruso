@@ -10,12 +10,12 @@ typedef struct {
 	const int* rownums;
 	const int* colnums;
 	const int shipcounts_length;
-	const int** shipcounts;
+	const int* shipcounts;
 
+	char** cur_board;
 	int* cur_rownums;
 	int* cur_colnums;
-	int** cur_shipcounts;
-	char** cur_board;
+	int* cur_shipcounts;
 } State;
 
 State process_parsed_input(ParsedInput in);

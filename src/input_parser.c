@@ -164,69 +164,46 @@ int* det_nums(const int index, const int nums_length, const char* arr, const cha
 	return nums;
 }
 
-int calc_shipcounts_length(const int index, const char* arr) {
-	int length = 0;
+int* det_shipcounts(const int index, const int shipcounts_length, const char* arr) {
+	int* shipcounts = int_alloc(shipcounts_length);
 
-	bool at_key = true; bool at_value = false; bool at_num = false; bool at_end = false;
+	bool at_key = true;
+	int key = 0;
+	bool at_value = false;
+	int value = 0;
+	bool at_end = false;
 
 	char* err_msg = "Each ship count must be of the form 'Bx: y'.";
 
 	for (int i = index; !at_end; i++) {
 		switch (arr[i]) {
 			case ZERO: case ONE: case TWO: case THREE: case FOUR:
-			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE: 
-				at_num = true;
+			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE:
+				if (at_key) {
+					key = 10 * key + (arr[i] - '0');
+				} else {
+					value = 10 * value + (arr[i] - '0');
+				}
 				break;
 
 			case COLON:
-				cond_err(!at_num || at_value, err_msg);
-				at_key = false; at_value = true; at_num = false;
+				cond_err(at_value, err_msg);
+				at_key = false; at_value = true;
 				break;
 
 			case EOF:
 				at_end = true;
 
 			case COMMA:
-				cond_err(!at_num || at_key, err_msg);
-				length++;
-				at_key = true; at_value = false; at_num = false;
+				cond_err(at_key, err_msg);
+				at_key = true; at_value = false;
+				shipcounts[key] = value;
+				key = 0;
+				value = 0;
 				break;
 
 			default:
 				err("Unknown characters in ship counts.");
-		}
-	}
-
-	return length;
-}
-
-int** det_shipcounts(const int index, const int length, const char* arr) {
-	int** shipcounts = int_mat(2, length);
-
-	int num = 0; 
-	bool at_end = false;
-	int i = 0;
-
-	for (int k = index; !at_end; k++) {
-    char a = arr[k];
-		switch (a) {
-			case ZERO: case ONE: case TWO: case THREE: case FOUR:
-			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE:
-				num = 10 * num + (a - '0');
-				break;
-
-			case COLON:
-				shipcounts[0][i] = num;
-				num = 0;
-				break;
-
-			case EOF:
-				at_end = true;
-
-			case COMMA:
-				shipcounts[1][i] = num;
-				num = 0;
-				i++;
 		}
 	}
 
@@ -276,8 +253,8 @@ ParsedInput parse_input(FILE* file) {
 	check_title(index, conv_arr, title, "4th section title must be '# Ship counts'.");
 	index += title_length;
 
-	const int shipcounts_length = calc_shipcounts_length(index, conv_arr);
-	const int** shipcounts = (const int**)det_shipcounts(index, shipcounts_length, conv_arr);
+	const int shipcounts_length = (m >= n) ? m+1 : n+1;
+	const int* shipcounts = (const int*)det_shipcounts(index, shipcounts_length, conv_arr);
 
 	return (ParsedInput){ m, n, board, rownums, colnums, shipcounts_length, shipcounts };
 }
