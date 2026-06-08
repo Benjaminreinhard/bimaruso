@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "utils.h"
-#include "solutions_finder.h"
+#include "solver.h"
 
 bool is_x_or_m_present(const int i, const int j, State s) {
 	return s.cur_board[i][j] == X || s.cur_board[i][j] == M;
@@ -118,6 +119,7 @@ bool check_cur_shipcounts(State s) {
 				break;
 			case O:
 				at_ship = true;
+				ship_size = 0;
 				break;
 			}
 		}
@@ -150,6 +152,7 @@ bool check_cur_shipcounts(State s) {
 				break;
 			case O:
 				at_ship = true;
+				ship_size = 0;
 				break;
 			}
 		}
@@ -161,6 +164,8 @@ bool check_cur_shipcounts(State s) {
 bool* next_moves(const int i, const int j, State s) {
 	// Next moves by board
 	bool* moves = next_moves_by_board(i, j, s);
+	// printi(moves[0]); printi(moves[1]); printf("\n\n");
+
 
 	// Enter next moves and see if board is valid
 	if (moves[0]) {
@@ -187,8 +192,43 @@ bool* next_moves(const int i, const int j, State s) {
 	return moves;
 }
 
-void find_solutions(State s) {
-	bool* moves = next_moves(6, 4, s);
-	printi(moves[0]); printi(moves[1]); printf("\n\n");
-	printcmat(s.cur_board, s.m, s.n);
+bool minmax_rec(int i, int j, State s) {
+	if (i == s.m) {
+		return true;
+	}
+
+	int i_next = (j <= s.m-2) ? i : i+1;
+	int j_next = (j <= s.m-2) ? j+1 : 0;
+
+	if (s.cur_board[i][j] != D) {
+		return minmax_rec(i_next, j_next, s);
+	};
+
+	bool* moves = next_moves(i, j, s);
+
+	if (moves[0]) {
+		s.cur_board[i][j] = O;
+		if (minmax_rec(i_next, j_next, s)) {
+			free(moves);
+			return true;
+		}
+		s.cur_board[i][j] = D;
+	}
+
+	if (moves[1]) {
+		s.cur_board[i][j] = X;
+		if (minmax_rec(i_next, j_next, s)) {
+			free(moves);
+			return true;
+		}
+		s.cur_board[i][j] = D;
+	}
+	free(moves);
+
+	return false;
+}
+
+void solve(State* s) {
+	(*s).solvable = minmax_rec(0,0, *s);
+	(*s).solve_func_done = true;
 }

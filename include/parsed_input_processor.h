@@ -13,6 +13,9 @@ typedef struct {
 
 	int* cur_shipcounts;
 	char** cur_board;
+
+	bool solve_func_done;
+	bool solvable;
 } State;
 
 State process_parsed_input(ParsedInput in);

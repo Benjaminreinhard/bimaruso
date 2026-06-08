@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "input_parser.h"
 #include "parsed_input_processor.h"
-#include "solutions_finder.h"
+#include "solver.h"
 
 int main(void) {
 	// Parse input file
@@ -17,6 +17,9 @@ int main(void) {
 	State s = process_parsed_input(in);
 
 	// Find solutions
-	find_solutions(s);
+	solve(&s);
+	printcmat(s.cur_board, 8, 8);
+	printi(s.solve_func_done);
+	printi(s.solvable);
 	return 0;
 }

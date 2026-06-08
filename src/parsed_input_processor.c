@@ -214,7 +214,9 @@ State process_parsed_input(ParsedInput in) {
 		in.colnums,
 		in.shipcounts,
 		int_alloc(length),
-		char_mat(in.m, in.n)
+		char_mat(in.m, in.n),
+		false,
+		false
 	};
 
 	// Check if parsed input has obvious LOGICAL errors, unlike parsing errors
