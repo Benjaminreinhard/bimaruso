@@ -250,6 +250,7 @@ void det_initial_cur_shipcounts(State s) {
 						}
 
 						if (cond) {
+							cond_err(s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size], "Foo");
 							s.cur_shipcounts[ship_size]++;
 							ship_size = 0;
 							at_ship = false;
@@ -281,6 +282,7 @@ void det_initial_cur_shipcounts(State s) {
 						cond = ship_size > 1;
 
 						if (cond) {
+							cond_err(s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size], "Foo");
 							s.cur_shipcounts[ship_size]++;
 							ship_size = 0;
 							at_ship = false;

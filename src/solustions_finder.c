@@ -65,7 +65,6 @@ bool* next_moves(const int i, const int j, State s) {
 	moves[1] = moves[1] && s.cur_colnums[j] < s.colnums[i];
 
 	// Next moves by shipcounts
-	//TODO
 
 	// Return next moves
 	return moves;
