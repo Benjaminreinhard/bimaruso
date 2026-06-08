@@ -4,6 +4,7 @@
 #include "input_parser.h"
 #include "parsed_input_processor.h"
 #include "solver.h"
+#include "renderer.h"
 
 int main(void) {
 	// Parse input file
@@ -18,8 +19,9 @@ int main(void) {
 
 	// Find solutions
 	solve(&s);
-	printcmat(s.cur_board, 8, 8);
-	printi(s.solve_func_done);
-	printi(s.solvable);
+
+	// Render state
+	render(s);
+
 	return 0;
 }

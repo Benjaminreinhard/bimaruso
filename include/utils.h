@@ -63,6 +63,4 @@ int** zero_int_mat(const int m, const int n);
 
 int calc_str_length(const char* str);
 
-void cell_symbol (const char cell);
-
 #endif
