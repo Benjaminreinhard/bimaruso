@@ -150,7 +150,36 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 	}
 }
 
-void fill_cur_board(State s) {
+void fill_x_cell_corners_with_o(const int i, const int j, State s) {
+	if (s.cur_board[i][j] != X) { return; }
+
+	bool cond;
+	if (i-1 >= 0 && j-1 >= 0) {
+		cond = s.cur_board[i-1][j-1] != O && s.cur_board[i-1][j-1] != D;
+		cond_err(cond, "A ship is too close to another one.");
+		s.cur_board[i-1][j-1] = O;
+	}
+
+	if (i+1 <= s.m-1 && j-1 >= 0) {
+		cond = s.cur_board[i+1][j-1] != O && s.cur_board[i+1][j-1] != D;
+		cond_err(cond, "A ship is too close to another one.");
+		s.cur_board[i+1][j-1] = O;
+	}
+
+	if (i-1 >= 0 && j+1 <= s.n-1) {
+		cond = s.cur_board[i-1][j+1] != O && s.cur_board[i-1][j+1] != D;
+		cond_err(cond, "A ship is too close to another one.");
+		s.cur_board[i-1][j+1] = O;
+	}
+
+	if (i+1 <= s.m-1 && j+1 <= s.n-1) {
+		cond = s.cur_board[i+1][j+1] != O && s.cur_board[i+1][j+1] != D;
+		cond_err(cond, "A ship is too close to another one.");
+		s.cur_board[i+1][j+1] = O;
+	}
+}
+
+void det_initial_cur_board(State s) {
 	for (int i = 0; i < s.m; i++) {
 		for (int j = 0; j < s.n; j++) {
 			s.cur_board[i][j] = D;
@@ -162,9 +191,15 @@ void fill_cur_board(State s) {
 			fill_cur_board_per_cell(i, j, s);
 		}
 	}
+
+	for (int i = 0; i < s.m; i++) {
+		for (int j = 0; j < s.n; j++) {
+			fill_x_cell_corners_with_o(i, j, s);
+		}
+	}
 }
 
-void fill_cur_rownums(State s) {
+void det_cur_rownums(State s) {
 	int count = 0;
 	for (int i = 0; i < s.m; i++) {
 		for (int j = 0; j < s.n; j++) {
@@ -177,7 +212,7 @@ void fill_cur_rownums(State s) {
 	}
 }
 
-void fill_cur_colnums(State s) {
+void det_cur_colnums(State s) {
 	int count = 0;
 	for (int j = 0; j < s.n; j++) {
 		for (int i = 0; i < s.m; i++) {
@@ -190,55 +225,112 @@ void fill_cur_colnums(State s) {
 	}
 }
 
-// void fill_cur_shipcounts(State s) {
-// 	int ship_size = 0;
-// 	bool at_ship = false;
-// 	for (int i = 0; i < s.m; i++) {
-// 		for (int j = 0; j < s.n; j++) {
-// 			switch (s.cur_board[i][j]) {
-// 			case D:
-// 				at_ship = false;
-// 				ship_size = 0;
-// 				break;
-// 			case O:
-// 				if (at_ship) {
-// 					if (s.cur_shipcounts[ship_size] < s.shipcounts[ship_size]) {
-// 						s.cur_shipcounts[ship_size]++;
-// 					}
-// 				};
-// 				break;
-// 			case X: case M:
-// 				at_ship = true;
-// 				ship_size++;
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
+void det_cur_shipcounts(State s) {
+	int ship_size = 0;
+	bool at_ship = false;
+	bool cond;
+	for (int i = 0; i < s.m; i++) {
+		for (int j = 0; j < s.n; j++) {
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case O:
+				if (at_ship) {
+					if (ship_size == 1) {
+						cond = (i == 0 || s.cur_board[i-1][j-1] == O) && (i == s.m-1 || s.cur_board[i+1][j-1] == O);
+						if (cond) {
+							cond_err(s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size], "Shipcounts are too low.");
+							s.cur_shipcounts[ship_size]++;
+						}
+					} else {
+						cond_err(s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size], "Shipcounts are too low.");
+						s.cur_shipcounts[ship_size]++;
+					}
+				};
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X: case M:
+				at_ship = true;
+				ship_size++;
+				break;
+			}
+		}
+	}
+
+	for (int j = 0; j < s.m; j++) {
+		for (int i = 0; i < s.m; i++) {
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case O:
+				if (at_ship) {
+					if (ship_size > 1) {
+						s.cur_shipcounts[ship_size]++;
+					}
+				};
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X: case M:
+				at_ship = true;
+				ship_size++;
+				break;
+			}
+		}
+	}
+
+	int k = 0;
+	for (; s.shipcounts[k] != -1; k++) {}
+	s.cur_shipcounts[k] = -1;
+}
 
 State process_parsed_input(ParsedInput in) {
+	// Determine length of shipcounts
+	int length = 0;
+	for (; in.shipcounts[length] != -1; length++) {}
+	length++;
+
+	// Initialize state
 	State s = (State){
 		in.m,
 		in.n,
 		in.board,
 		in.rownums,
 		in.colnums,
-		in.shipcounts_length,
 		in.shipcounts,
 		char_mat(in.m, in.n),
 		zero_int_alloc(in.m),
 		zero_int_alloc(in.n),
-		zero_int_alloc(in.shipcounts_length)
+		zero_int_alloc(length)
 	};
 
-	fill_cur_board(s);
-	fill_cur_rownums(s);
-	fill_cur_colnums(s);
-	// fill_cur_shipcounts(s);
+	// Check if parsed input has obvious LOGICAL errors, unlike parsing errors
+	for (int k = 0; k < s.m; k++) {
+		cond_err(in.rownums[k] > s.n, "Row numbers must be smaller or equal to the number of columns.");
+	}
 
-	// printis(s.shipcounts, s.shipcounts_length);
-	// printf("\n");
-	// printis(s.cur_shipcounts, s.shipcounts_length);
+	for (int k = 0; k < s.n; k++) {
+		cond_err(in.colnums[k] > s.m, "Column numbers must be smaller or equal to the number of rows.");
+	}
 
+	int sum = 0;
+	for (int k = 0;; k++) {
+		if (s.shipcounts[k] == -1) { break; }
+		sum+= s.shipcounts[k];
+		cond_err(sum > s.m*s.n, "Ship counts are too high.");
+	}
+
+	// Determine the current values that will be used later
+	det_initial_cur_board(s);
+	det_cur_rownums(s);
+	det_cur_colnums(s);
+	det_cur_shipcounts(s);
+
+	// Return the state
 	return s;
 }

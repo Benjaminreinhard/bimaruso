@@ -9,7 +9,6 @@ typedef struct {
 	const char** board;
 	const int* rownums;
 	const int* colnums;
-	const int shipcounts_length;
 	const int* shipcounts;
 } ParsedInput;
 

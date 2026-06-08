@@ -46,6 +46,7 @@ void cond_mem_err(const bool cond);
 int* int_alloc(const int length);
 char* char_alloc(const int length);
 char* char_realloc(char* ptr, const int length);
+int* int_realloc(int* ptr, const int length);
 int** int_mat(const int m, const int n);
 char** char_mat(const int m, const int n);
 

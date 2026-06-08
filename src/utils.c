@@ -63,6 +63,12 @@ char* char_alloc(const int length) {
 	return ptr;
 }
 
+int* int_realloc(int* ptr, const int length) {
+	ptr = realloc(ptr, (size_t)length * sizeof(int));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
+
 char* char_realloc(char* ptr, const int length) {
 	ptr = realloc(ptr, (size_t)length * sizeof(char));
 	cond_mem_err(ptr == NULL);

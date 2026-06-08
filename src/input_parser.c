@@ -7,6 +7,7 @@
 #include "input_parser.h"
 
 #define MAX_FILE_LENGTH 1000
+#define MAX_NUM 50
 
 // Helper functions
 char* file_to_arr(FILE* file) {
@@ -73,6 +74,7 @@ int* calc_mn(const int index, const char* arr) {
 			case D: case W: case S: case R: case T: case L: case B: case M:
 				if (!n_determined) { mn[1]++; }	
 				n_++;
+				cond_err(n_ > MAX_NUM, "At most 50 columns allowed.");
 				break;
 
 			case HASH:
@@ -83,6 +85,7 @@ int* calc_mn(const int index, const char* arr) {
 				cond_err(n_ != mn[1], "Rows are not equally long.");
 				n_ = 0;
 				mn[0]++;
+				cond_err(mn[0] > MAX_NUM, "At most 50 rows allowed.");
 				break;
 
 			case EOF:
@@ -139,6 +142,7 @@ int* det_nums(const int index, const int nums_length, const char* arr, const cha
 			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE: 
 				at_num = true;
 				num = 10 * num + (a - '0');
+				cond_err(num > MAX_NUM, err_msg);
 				break;
 
 			case HASH:
@@ -164,8 +168,8 @@ int* det_nums(const int index, const int nums_length, const char* arr, const cha
 	return nums;
 }
 
-int* det_shipcounts(const int index, const int shipcounts_length, const char* arr) {
-	int* shipcounts = int_alloc(shipcounts_length);
+int* det_shipcounts(const int index, const char* arr) {
+	int* shipcounts = zero_int_alloc(MAX_NUM+2);
 
 	bool at_key = true;
 	int key = 0;
@@ -173,7 +177,7 @@ int* det_shipcounts(const int index, const int shipcounts_length, const char* ar
 	int value = 0;
 	bool at_end = false;
 
-	char* err_msg = "Each ship count must be of the form 'Bx: y'.";
+	char* err_msg = "Each ship count must be of the form 'Bx: y' and x,y can at most be equal to 50.";
 
 	for (int i = index; !at_end; i++) {
 		switch (arr[i]) {
@@ -181,8 +185,10 @@ int* det_shipcounts(const int index, const int shipcounts_length, const char* ar
 			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE:
 				if (at_key) {
 					key = 10 * key + (arr[i] - '0');
+					cond_err(key > MAX_NUM, err_msg);
 				} else {
 					value = 10 * value + (arr[i] - '0');
+					cond_err(key > MAX_NUM, err_msg);
 				}
 				break;
 
@@ -197,6 +203,7 @@ int* det_shipcounts(const int index, const int shipcounts_length, const char* ar
 			case COMMA:
 				cond_err(at_key, err_msg);
 				at_key = true; at_value = false;
+				cond_err(shipcounts[key] != 0, "A ship size appears more than once in the ship count section.");
 				shipcounts[key] = value;
 				key = 0;
 				value = 0;
@@ -206,6 +213,14 @@ int* det_shipcounts(const int index, const int shipcounts_length, const char* ar
 				err("Unknown characters in ship counts.");
 		}
 	}
+
+	int last_key = 0;
+	for (int k = 0; k < MAX_NUM+1; k++) {
+		if (shipcounts[k] != 0) { last_key = k; }
+	}
+
+	shipcounts[last_key+1] = -1;
+	shipcounts = int_realloc(shipcounts, last_key+2);
 
 	return shipcounts;
 }
@@ -235,7 +250,7 @@ ParsedInput parse_input(FILE* file) {
 	check_title(index, conv_arr, title, "2nd section title must be '# Row numbers'.");
 	index += title_length;
 
-	const int* rownums = det_nums(index, m, conv_arr, "Invalid row numbers section.");
+	const int* rownums = det_nums(index, m, conv_arr, "Invalid row numbers section. Note that numbers can at most be equal to 50.");
 
 	// Process column numbers section
 	index = det_index_of_letter(index, '#', conv_arr);
@@ -244,7 +259,7 @@ ParsedInput parse_input(FILE* file) {
 	check_title(index, conv_arr, title, "3rd section title must be '# Column numbers'.");
 	index += title_length;
 
-	const int* colnums = det_nums(index, n, conv_arr, "Invalid column numbers section.");
+	const int* colnums = det_nums(index, n, conv_arr, "Invalid column numbers section. Note that numbers can at most be two digits long.");
 
 	// Process ship counts section
 	index = det_index_of_letter(index, '#', conv_arr);
@@ -253,9 +268,9 @@ ParsedInput parse_input(FILE* file) {
 	check_title(index, conv_arr, title, "4th section title must be '# Ship counts'.");
 	index += title_length;
 
-	const int shipcounts_length = (m >= n) ? m+1 : n+1;
-	const int* shipcounts = (const int*)det_shipcounts(index, shipcounts_length, conv_arr);
+	const int* shipcounts = (const int*)det_shipcounts(index, conv_arr);
 
-	return (ParsedInput){ m, n, board, rownums, colnums, shipcounts_length, shipcounts };
+	// Return parsed input
+	return (ParsedInput){ m, n, board, rownums, colnums, shipcounts };
 }
 
