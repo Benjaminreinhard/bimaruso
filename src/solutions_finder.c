@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#include "utils.h"
+#include "solutions_finder.h"
+
+bool is_x_or_m_present(const int i, const int j, State s) {
+	return s.cur_board[i][j] == X || s.cur_board[i][j] == M;
+}
+
+bool* next_moves_by_board(const int i, const int j, State s) {
+	bool* moves = zero_bool_alloc(2);
+
+	bool m_present;
+	bool can_be_o = true;
+	bool can_be_x = true;
+
+	if (i-1 >= 0) {
+		if (j-1 >= 0) {
+			can_be_x = can_be_x && !is_x_or_m_present(i-1, j-1, s);
+
+			m_present = s.cur_board[i-1][j] == M || s.cur_board[i][j-1] == M;
+			can_be_o = can_be_o && !(m_present && s.cur_board[i-1][j-1] == O);
+		}
+
+		if (j+1 <= s.n-1) {
+			can_be_x = can_be_x && !is_x_or_m_present(i-1, j+1, s);
+
+			m_present = s.cur_board[i][j+1] == M || s.cur_board[i-1][j] == M;
+			can_be_o = can_be_o && !(m_present && s.cur_board[i-1][j+1] == O);
+		}
+	}
+
+	if (i+1 <= s.m-1) {
+		if (j-1 >= 0) {
+			can_be_x =  can_be_x && !is_x_or_m_present(i+1, j-1, s);
+
+			m_present = s.cur_board[i+1][j] == M || s.cur_board[i][j-1] == M;
+			can_be_o = can_be_o && !(m_present && s.cur_board[i+1][j-1] == O);
+		}
+
+		if (j+1 <= s.n-1) {
+			can_be_x = can_be_x && !is_x_or_m_present(i+1, j+1, s);
+
+			m_present = s.cur_board[i][j+1] == M || s.cur_board[i+1][j] == M;
+			can_be_o = can_be_o && !(m_present && s.cur_board[i+1][j+1] == O);
+		}
+	}
+
+	moves[0] = can_be_o;
+	moves[1] = can_be_x;
+
+	return moves;
+}
+
+bool check_cur_rownum(const int i, State s) {
+	int xm_count = 0;
+	int o_count = 0;
+	char a;
+	for (int j = 0; j < s.n; j++) {
+		a = s.cur_board[i][j];
+		if (a == X || a == M) { xm_count++; }
+		if (a == O) { o_count++; }
+	}
+	return xm_count <= s.rownums[i] && o_count <= s.n - s.rownums[i];
+}
+
+bool check_cur_colnum(const int j, State s) {
+	int xm_count = 0;
+	int o_count = 0;
+	char a;
+	for (int i = 0; i < s.m; i++) {
+		a = s.cur_board[i][j];
+		if (a == X || a == M) { xm_count++; }
+		if (a == O) { o_count++; }
+	}
+	return xm_count <= s.colnums[j] && o_count <= s.m - s.colnums[j];
+}
+
+bool check_cur_shipcounts(State s) {
+	for (int k = 0;;k++) {
+		if (s.cur_shipcounts[k] == -1) { break; }
+		s.cur_shipcounts[k] = 0;
+	}
+
+	int ship_size;
+	bool at_ship;
+	bool cond;
+
+	for (int i = 0; i < s.m; i++) {
+		at_ship = true;
+		ship_size = 0;
+		for (int j = 0; j < s.n; j++) {
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X:
+			case M:
+				if (at_ship) {
+					ship_size++;
+					if (j == s.n-1 || s.cur_board[i][j+1] == O) {
+						cond = ship_size > 1;
+						if (!cond) {
+							cond = (i == 0 || s.cur_board[i-1][j] == O);
+							cond = cond && (i == s.m-1 || s.cur_board[i+1][j] == O);
+						}
+
+						if (cond) {
+							if (s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size]) { return false; };
+							s.cur_shipcounts[ship_size]++;
+							ship_size = 0;
+							at_ship = false;
+						}
+					}
+				}
+				break;
+			case O:
+				at_ship = true;
+				break;
+			}
+		}
+	}
+
+	for (int j = 0; j < s.n; j++) {
+		at_ship = true;
+		ship_size = 0;
+		for (int i = 0; i < s.n; i++) {
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X:
+			case M:
+				if (at_ship) {
+					ship_size++;
+					if (i == s.m-1 || s.cur_board[i+1][j] == O) {
+						cond = ship_size > 1;
+
+						if (cond) {
+							if (s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size]) { return false; };
+							s.cur_shipcounts[ship_size]++;
+							ship_size = 0;
+							at_ship = false;
+						}
+					}
+				}
+				break;
+			case O:
+				at_ship = true;
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool* next_moves(const int i, const int j, State s) {
+	// Next moves by board
+	bool* moves = next_moves_by_board(i, j, s);
+
+	// Enter next moves and see if board is valid
+	if (moves[0]) {
+		s.cur_board[i][j] = O;
+
+		moves[0] = moves[0] && check_cur_rownum(i, s);
+		moves[0] = moves[0] && check_cur_colnum(j, s);
+		moves[0] = moves[0] && check_cur_shipcounts(s);
+
+		s.cur_board[i][j] = D;
+	}
+
+	if (moves[1]) {
+		s.cur_board[i][j] = X;
+
+		moves[1] = moves[1] && check_cur_rownum(i, s);
+		moves[1] = moves[1] && check_cur_colnum(j, s);
+		moves[1] = moves[1] && check_cur_shipcounts(s);
+
+		s.cur_board[i][j] = D;
+	}
+
+	// Return next moves
+	return moves;
+}
+
+void find_solutions(State s) {
+	bool* moves = next_moves(6, 4, s);
+	printi(moves[0]); printi(moves[1]); printf("\n\n");
+	printcmat(s.cur_board, s.m, s.n);
+}
