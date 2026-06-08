@@ -228,50 +228,69 @@ void det_initial_cur_colnums(State s) {
 void det_initial_cur_shipcounts(State s) {
 	int ship_size;
 	bool at_ship;
-	char a;
+	bool cond;
 	for (int i = 0; i < s.m; i++) {
-		at_ship = false;
+		at_ship = true;
 		ship_size = 0;
 		for (int j = 0; j < s.n; j++) {
-			a = s.cur_board[i][j];
-			if (i == 0) {
-				if (a == X || a == M) {
-					at_ship = true;
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X:
+			case M:
+				if (at_ship) {
 					ship_size++;
-				} else if (a == O) {
-					at_ship = true;
-				}
-			} else if (i < s.m-1) {
-				if (a == O) {
-					at_ship = true;
-					if (ship_size > 0) {
-						s.cur_shipcounts[ship_size]++;
-						ship_size = 0;
-					}
-				} else if (a == D) {
-					at_ship = false;
-					ship_size = 0;
-				} else {
-					if (at_ship) {
-						ship_size++;
-					}
-				}
+					if (j == s.n-1 || s.cur_board[i][j+1] == O) {
+						cond = ship_size > 1;
+						if (!cond) {
+							cond = (i == 0 || s.cur_board[i-1][j] == O);
+							cond = cond && (i == s.m-1 || s.cur_board[i+1][j] == O);
+						}
 
-			} else {
-				if (a == O) {
-					if (ship_size > 0) {
-						s.cur_shipcounts[ship_size]++;
-						ship_size = 0;
+						if (cond) {
+							s.cur_shipcounts[ship_size]++;
+							ship_size = 0;
+							at_ship = false;
+						}
 					}
-				} else if (a == X || a == M) {
-					ship_size++;
-					if (ship_size > 0) {
-						s.cur_shipcounts[ship_size]++;
-						ship_size = 0;
-					}
-				} else {
-					ship_size++;
 				}
+				break;
+			case O:
+				at_ship = true;
+				break;
+			}
+		}
+	}
+
+	for (int j = 0; j < s.n; j++) {
+		at_ship = true;
+		ship_size = 0;
+		for (int i = 0; i < s.n; i++) {
+			switch (s.cur_board[i][j]) {
+			case D:
+				at_ship = false;
+				ship_size = 0;
+				break;
+			case X:
+			case M:
+				if (at_ship) {
+					ship_size++;
+					if (i == s.m-1 || s.cur_board[i+1][j] == O) {
+						cond = ship_size > 1;
+
+						if (cond) {
+							s.cur_shipcounts[ship_size]++;
+							ship_size = 0;
+							at_ship = false;
+						}
+					}
+				}
+				break;
+			case O:
+				at_ship = true;
+				break;
 			}
 		}
 	}
@@ -279,8 +298,6 @@ void det_initial_cur_shipcounts(State s) {
 	int k = 0;
 	for (; s.shipcounts[k] != -1; k++) {}
 	s.cur_shipcounts[k] = -1;
-
-	printis(s.cur_shipcounts, k+1);
 }
 
 State process_parsed_input(ParsedInput in) {
