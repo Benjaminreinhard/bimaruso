@@ -63,6 +63,13 @@ char* char_alloc(const int length) {
 	return ptr;
 }
 
+bool* bool_alloc(const int length) {
+	bool* ptr = malloc((size_t)length * sizeof(bool));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
+
+
 int* int_realloc(int* ptr, const int length) {
 	ptr = realloc(ptr, (size_t)length * sizeof(int));
 	cond_mem_err(ptr == NULL);
@@ -139,6 +146,22 @@ int* zero_int_alloc(const int length) {
 	int* arr = int_alloc(length);
 	for (int i = 0; i < length; i++) {
 		arr[i] = 0;
+	}
+	return arr;
+}
+
+char* zero_char_alloc(const int length) {
+	char* arr = char_alloc(length);
+	for (int i = 0; i < length; i++) {
+		arr[i] = 0;
+	}
+	return arr;
+}
+
+bool* zero_bool_alloc(const int length) {
+	bool* arr = bool_alloc(length);
+	for (int i = 0; i < length; i++) {
+		arr[i] = false;
 	}
 	return arr;
 }
