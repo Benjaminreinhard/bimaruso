@@ -25,12 +25,16 @@ endif
 # -----------------
 
 CLEAN_DIR := $(BUILD_DIR)
+BIN_DEV := bimaruso-dev
+BIN_REL := bimaruso
 
 ifeq ($(MODE), dev)
 BUILD_DIR := $(BUILD_DIR)/dev
+BINARY := $(BIN_DEV)
 CFLAGS += -g -O0 -DDEBUG
 else ifeq ($(MODE), release)
 BUILD_DIR := $(BUILD_DIR)/release
+BINARY := $(BIN_REL)
 CFLAGS += -O3 -DNDEBUG
 VERBOSE := 1
 endif
@@ -40,8 +44,6 @@ Q := @
 else ifeq ($(VERBOSE), 1)
 Q :=
 endif
-
-BINARY := $(BUILD_DIR)/program
 
 SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/gen/%.o, $(SRCS))
@@ -68,3 +70,4 @@ $(BUILD_DIR)/gen/%.o: $(SRC_DIR)/%.c
 .PHONY: clean
 clean:
 	rm -rf $(CLEAN_DIR)
+	rm -rf $(BIN_DEV) $(BIN_REL)
