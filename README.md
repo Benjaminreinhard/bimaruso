@@ -4,7 +4,7 @@ This program solves Bimaru riddles. You only need to enter the Bimaru initial st
 
 ##  Reqiurements
 
-You only need gcc and make.
+You only need `gcc` and `make`.
 
 ## Installation
 
