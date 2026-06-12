@@ -171,6 +171,7 @@ int* det_nums(const int index, const int nums_length, const char* arr, const cha
 int* det_shipcounts(const int index, const char* arr) {
 	int* shipcounts = int_calloc(MAX_NUM+2);
 
+	bool at_num = false;
 	bool at_key = true;
 	int key = 0;
 	bool at_value = false;
@@ -183,6 +184,7 @@ int* det_shipcounts(const int index, const char* arr) {
 		switch (arr[i]) {
 			case ZERO: case ONE: case TWO: case THREE: case FOUR:
 			case FIVE: case SIX: case SEVEN: case EIGHT: case NINE:
+				at_num = true;
 				if (at_key) {
 					key = 10 * key + (arr[i] - '0');
 					cond_err(key > MAX_NUM, err_msg);
@@ -193,16 +195,16 @@ int* det_shipcounts(const int index, const char* arr) {
 				break;
 
 			case COLON:
-				cond_err(at_value, err_msg);
-				at_key = false; at_value = true;
+				cond_err(at_value || !at_num, err_msg);
+				at_key = false; at_value = true; at_num = false;
 				break;
 
 			case EOF:
 				at_end = true;
 
 			case COMMA:
-				cond_err(at_key, err_msg);
-				at_key = true; at_value = false;
+				cond_err(at_key || !at_num, err_msg);
+				at_key = true; at_value = false; at_num = false;
 				cond_err(shipcounts[key] != 0, "A ship size appears more than once in the ship count section.");
 				shipcounts[key] = value;
 				key = 0;
