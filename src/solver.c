@@ -10,7 +10,7 @@ bool is_x_or_m_present(const int i, const int j, State s) {
 }
 
 bool* next_moves_by_board(const int i, const int j, State s) {
-	bool* moves = zero_bool_alloc(2);
+	bool* moves = bool_calloc(2);
 
 	bool m_present;
 	bool can_be_o = true;
@@ -164,28 +164,19 @@ bool check_cur_shipcounts(State s) {
 bool* next_moves(const int i, const int j, State s) {
 	// Next moves by board
 	bool* moves = next_moves_by_board(i, j, s);
-	// printi(moves[0]); printi(moves[1]); printf("\n\n");
 
+	// Enter next moves and see if the board is valid
+	for (int k = 0; k < 2; k++) {
+		if (!moves[k]) { continue; }
 
-	// Enter next moves and see if board is valid
-	if (moves[0]) {
-		s.cur_board[i][j] = O;
+		s.cur_board[i][j] = (k == 0) ? O : X;
 
-		moves[0] = moves[0] && check_cur_rownum(i, s);
-		moves[0] = moves[0] && check_cur_colnum(j, s);
-		moves[0] = moves[0] && check_cur_shipcounts(s);
-
-		s.cur_board[i][j] = D;
-	}
-
-	if (moves[1]) {
-		s.cur_board[i][j] = X;
-
-		moves[1] = moves[1] && check_cur_rownum(i, s);
-		moves[1] = moves[1] && check_cur_colnum(j, s);
-		moves[1] = moves[1] && check_cur_shipcounts(s);
+		moves[k] = moves[k] && check_cur_rownum(i, s);
+		moves[k] = moves[k] && check_cur_colnum(j, s);
+		moves[k] = moves[k] && check_cur_shipcounts(s);
 
 		s.cur_board[i][j] = D;
+
 	}
 
 	// Return next moves
@@ -206,23 +197,19 @@ bool minmax_rec(int i, int j, State s) {
 
 	bool* moves = next_moves(i, j, s);
 
-	if (moves[0]) {
-		s.cur_board[i][j] = O;
+	for (int k = 0; k < 2; k++) {
+		if (!moves[k]) { continue; }
+
+		s.cur_board[i][j] = (k == 0) ? O : X;
+
 		if (minmax_rec(i_next, j_next, s)) {
 			free(moves);
 			return true;
 		}
+
 		s.cur_board[i][j] = D;
 	}
 
-	if (moves[1]) {
-		s.cur_board[i][j] = X;
-		if (minmax_rec(i_next, j_next, s)) {
-			free(moves);
-			return true;
-		}
-		s.cur_board[i][j] = D;
-	}
 	free(moves);
 
 	return false;

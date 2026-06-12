@@ -46,20 +46,27 @@ void cond_mem_err(const bool cond);
 int* int_alloc(const int length);
 char* char_alloc(const int length);
 bool* bool_alloc(const int length);
+
+int* int_calloc(const int length);
+char* char_calloc(const int length);
+bool* bool_calloc(const int length);
+
 char* char_realloc(char* ptr, const int length);
 int* int_realloc(int* ptr, const int length);
+
 int** int_mat(const int m, const int n);
 char** char_mat(const int m, const int n);
+bool** bool_mat(const int m, const int n);
+
+int** int_cmat(const int m, const int n);
+char** char_cmat(const int m, const int n);
+bool** bool_cmat(const int m, const int n);
 
 int* cpy_int_arr(const int* arr, const int length);
 char* cpy_char_arr(const char* arr, const int length);
+
 int** cpy_int_mat(const int** mat, const int m, const int n);
 char** cpy_char_mat(const char** mat, const int m, const int n);
-
-int* zero_int_alloc(const int length);
-char* zero_char_alloc(const int length);
-bool* zero_bool_alloc(const int length);
-int** zero_int_mat(const int m, const int n);
 
 int calc_str_length(const char* str);
 

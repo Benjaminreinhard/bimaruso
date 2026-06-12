@@ -7,10 +7,11 @@
 #include "renderer.h"
 
 int main(void) {
-	// Parse input file
+	// Locate input file
 	FILE* file = fopen("input.md", "r");
 	cond_err(file == NULL, "File not found.");
 
+	// Parse input file
 	ParsedInput in = parse_input(file);
 	fclose(file);
 

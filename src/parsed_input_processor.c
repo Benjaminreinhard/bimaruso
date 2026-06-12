@@ -24,6 +24,7 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 	int l_end = (j == s.n-1) ? j : j+1;
 	char a;
 	bool cond;
+	char* err_msg;
 	for (int k = k_start; k <= k_end; k++) {
 		for (int l = l_start; l <= l_end; l++) {
 			a = s.board[k][l];
@@ -39,79 +40,80 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 				if (k == i && l == j) {
 					s.cur_board[i][j] = X;
 				} else {
-					fill_o_err(a, s.cur_board[k][l], "s Foo");
+					fill_o_err(a, s.cur_board[k][l], "A single boat is too close to another boat.");
 					s.cur_board[k][l] = O;
 				}
 				break;
 
 			case R:
-				cond_err(j == 0, "r Foo 1");
+				cond_err(j == 0, "A right end can not in the first column.");
 
 				if (k == i && l == j) {
 					s.cur_board[i][j] = X;
 				} else if (k == i && l == l_start) {
-					side_err(a, s.cur_board[k][l], L, "r Foo 2");					
+					side_err(a, s.cur_board[k][l], L, "The cell to the left of a right end needs to be filable.");					
 					s.cur_board[k][l] = X;
 				} else {
-					fill_o_err(a, s.cur_board[k][l], "r Foo");
+					fill_o_err(a, s.cur_board[k][l], "A right end ist too close to another boat.");
 					s.cur_board[k][l] = O;
 				}
 				break;
 
 			case T:
-				cond_err(i == s.m-1, "t Foo 1");
+				cond_err(i == s.m-1, "A top end can not in the last row.");
 
 				if (k == i && l == j) {
 					s.cur_board[i][j] = X;
 				} else if (k == k_end && l == j) {
-					side_err(a, s.cur_board[k][l], B, "t Foo 2");				
+					side_err(a, s.cur_board[k][l], B, "The cell on the bottom of a top end needs to be filable.");				
 					s.cur_board[k][l] = X;
 				} else {
-					fill_o_err(a, s.cur_board[k][l], "t Foo");
+					fill_o_err(a, s.cur_board[k][l], "A top end ist too close to another boat.");
 					s.cur_board[k][l] = O;
 				}
 				break;
 
 			case L:
-				cond_err(j == s.n-1, "l Foo 1");
+				cond_err(j == s.n-1, "A left end can not in the last column.");
 
 				if (k == i && l == j) {
 					s.cur_board[i][j] = X;
 				} else if (k == i && l == l_end) {
-					side_err(a, s.cur_board[k][l], R, "l Foo 2");				
+					side_err(a, s.cur_board[k][l], R, "The cell to the right of a left end needs to be filable.");				
 					s.cur_board[k][l] = X;
 				} else {
-					fill_o_err(a, s.cur_board[k][l], "l Foo");
+					fill_o_err(a, s.cur_board[k][l], "A left end ist too close to another boat.");
 					s.cur_board[k][l] = O;
 				}
 				break;
 
 			case B:
-				cond_err(i == 0, "b Foo 1");
+				cond_err(i == 0, "A bottom end can not in the first column.");
 
 				if (k == i && l == j) {
 					s.cur_board[i][j] = X;
 				} else if (k == k_start && l == j) {
-					side_err(a, s.cur_board[k][l], T, "b Foo 2");
+					side_err(a, s.cur_board[k][l], T, "The cell to the top of a bottom end needs to be filable.");
 					s.cur_board[k][l] = X;
 				} else {
-					fill_o_err(a, s.cur_board[k][l], "b Foo");
+					fill_o_err(a, s.cur_board[k][l], "A bottom end ist too close to another boat");
 					s.cur_board[k][l] = O;
 				}
 				break;
 			case M:
 				cond = (i == 0 || i == s.m-1) && (j == 0 || j == s.n-1);
-				cond_err(cond, "m Foo 1");
+				cond_err(cond, "A middle piece can not be in a corner.");
 
+				err_msg = "The cells to the left and right of a middle piece that is in the first or last row need to be fillable.";
 				if (i == 0 || i == s.m-1) {
 					if (k != i) {
-						fill_o_err(a, s.cur_board[k][l], "m Foo 2");
+						fill_o_err(a, s.cur_board[k][l], "A middle piece is too close to another boat.");
 						s.cur_board[k][l] = O;
 					} else if (l == j-1) {
-						side_err(a, s.cur_board[k][l], L, "m Foo 3");
+						side_err(a, s.cur_board[k][l], L, err_msg);
 						s.cur_board[k][l] = X;
 					} else if (l == j+1) {
-						side_err(a, s.cur_board[k][l], R, "m Foo 4");
+						side_err(a, s.cur_board[k][l], R, err_msg);
 						s.cur_board[k][l] = X;
 					} else {
 						s.cur_board[k][l] = X;
@@ -119,15 +121,16 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 					continue;
 				}
 
+				err_msg = "The cells to the top and bottom of a middle piece that is in the first or last column need to be fillable.";
 				if (j == 0 || j == s.n-1) {
 					if (l != j) {
-						fill_o_err(a, s.cur_board[k][l], "m Foo 5");
+						fill_o_err(a, s.cur_board[k][l], "A middle piece is too close to another boat.");
 						s.cur_board[k][l] = O;
 					} else if (k == i-1) {
-						side_err(a, s.cur_board[k][l], T, "m Foo 6");
+						side_err(a, s.cur_board[k][l], T, err_msg);
 						s.cur_board[k][l] = X;
 					} else if (k == i+1) {
-						side_err(a, s.cur_board[k][l], B, "m Foo 7");
+						side_err(a, s.cur_board[k][l], B, err_msg);
 						s.cur_board[k][l] = X;
 					} else {
 						s.cur_board[k][l] = X;
@@ -141,7 +144,7 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 				}
 
 				if (k != i && l != j) {
-					fill_o_err(a, s.cur_board[k][l], "m Foo 8");
+					fill_o_err(a, s.cur_board[k][l], "A middle piece is too close to another boat.");
 					s.cur_board[k][l] = O;
 					continue;
 				}

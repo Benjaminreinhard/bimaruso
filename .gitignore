@@ -1,4 +1,6 @@
 build/
+bimaruso*
+
 dist/
 .env/
 env/

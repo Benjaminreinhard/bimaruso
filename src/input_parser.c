@@ -169,7 +169,7 @@ int* det_nums(const int index, const int nums_length, const char* arr, const cha
 }
 
 int* det_shipcounts(const int index, const char* arr) {
-	int* shipcounts = zero_int_alloc(MAX_NUM+2);
+	int* shipcounts = int_calloc(MAX_NUM+2);
 
 	bool at_key = true;
 	int key = 0;
@@ -236,9 +236,9 @@ ParsedInput parse_input(FILE* file) {
 	// Process board section
 	int index = 0;
 
-	char* title = "#board"; int title_length = calc_str_length(title);
+	char* title = "#board";
 	check_title(index, conv_arr, title, "1st section title must be '# Board'.");
-	index += title_length;
+	index += calc_str_length(title);
 
 	const int* mn = calc_mn(index, conv_arr); const int m = mn[0]; const int n = mn[1];
 	const char** board = (const char**)det_board(index, m, n, conv_arr);
@@ -246,27 +246,27 @@ ParsedInput parse_input(FILE* file) {
 	// Process row numbers section
 	index = det_index_of_letter(index, '#', conv_arr);
 
-	title = "#rownumbers"; title_length = calc_str_length(title);
+	title = "#rownumbers";
 	check_title(index, conv_arr, title, "2nd section title must be '# Row numbers'.");
-	index += title_length;
+	index += calc_str_length(title);
 
 	const int* rownums = det_nums(index, m, conv_arr, "Invalid row numbers section. Note that numbers can at most be equal to 50.");
 
 	// Process column numbers section
 	index = det_index_of_letter(index, '#', conv_arr);
 
-	title = "#columnnumbers"; title_length = calc_str_length(title);
+	title = "#columnnumbers";
 	check_title(index, conv_arr, title, "3rd section title must be '# Column numbers'.");
-	index += title_length;
+	index += calc_str_length(title);
 
-	const int* colnums = det_nums(index, n, conv_arr, "Invalid column numbers section. Note that numbers can at most be two digits long.");
+	const int* colnums = det_nums(index, n, conv_arr, "Invalid column numbers section. Note that numbers can at most be equal to 50.");
 
 	// Process ship counts section
 	index = det_index_of_letter(index, '#', conv_arr);
 
-	title = "#shipcounts"; title_length = calc_str_length(title);
+	title = "#shipcounts";
 	check_title(index, conv_arr, title, "4th section title must be '# Ship counts'.");
-	index += title_length;
+	index += calc_str_length(title);
 
 	const int* shipcounts = (const int*)det_shipcounts(index, conv_arr);
 

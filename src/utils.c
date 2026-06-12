@@ -69,7 +69,26 @@ bool* bool_alloc(const int length) {
 	return ptr;
 }
 
+// Callocation functions
+int* int_calloc(const int length) {
+	int* ptr = calloc((size_t)length, sizeof(int));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
 
+char* char_calloc(const int length) {
+	char* ptr = calloc((size_t)length, sizeof(char));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
+
+bool* bool_calloc(const int length) {
+	bool* ptr = calloc((size_t)length, sizeof(bool));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
+
+// Reallocation functions
 int* int_realloc(int* ptr, const int length) {
 	ptr = realloc(ptr, (size_t)length * sizeof(int));
 	cond_mem_err(ptr == NULL);
@@ -82,6 +101,13 @@ char* char_realloc(char* ptr, const int length) {
 	return ptr;
 }
 
+bool* bool_realloc(bool* ptr, const int length) {
+	ptr = realloc(ptr, (size_t)length * sizeof(bool));
+	cond_mem_err(ptr == NULL);
+	return ptr;
+}
+
+// Matrix allocation functions
 int** int_mat(const int m, const int n) {
 	int** mat = malloc((size_t)m * sizeof(int*));
 	cond_mem_err(mat == NULL);
@@ -99,6 +125,51 @@ char** char_mat(const int m, const int n) {
 
 	for (int i = 0; i < m; i++) {
 		mat[i] = char_alloc(n);
+	}
+
+	return mat;
+}
+
+bool** bool_mat(const int m, const int n) {
+	bool** mat = malloc((size_t)m * sizeof(bool*));
+	cond_mem_err(mat == NULL);
+
+	for (int i = 0; i < m; i++) {
+		mat[i] = bool_alloc(n);
+	}
+
+	return mat;
+}
+
+// Matrix callocation functions
+int** int_cmat(const int m, const int n) {
+	int** mat = malloc((size_t)m * sizeof(int*));
+	cond_mem_err(mat == NULL);
+
+	for (int i = 0; i < m; i++) {
+		mat[i] = int_calloc(n);
+	}
+
+	return mat;
+}
+
+char** char_cmat(const int m, const int n) {
+	char** mat = malloc((size_t)m * sizeof(char*));
+	cond_mem_err(mat == NULL);
+
+	for (int i = 0; i < m; i++) {
+		mat[i] = char_calloc(n);
+	}
+
+	return mat;
+}
+
+bool** bool_cmat(const int m, const int n) {
+	bool** mat = malloc((size_t)m * sizeof(bool*));
+	cond_mem_err(mat == NULL);
+
+	for (int i = 0; i < m; i++) {
+		mat[i] = bool_calloc(n);
 	}
 
 	return mat;
@@ -139,41 +210,6 @@ char** cpy_char_mat(const char** mat, const int m, const int n) {
 		}
 	}
 	return cpy;
-}
-
-// Zero functions
-int* zero_int_alloc(const int length) {
-	int* arr = int_alloc(length);
-	for (int i = 0; i < length; i++) {
-		arr[i] = 0;
-	}
-	return arr;
-}
-
-char* zero_char_alloc(const int length) {
-	char* arr = char_alloc(length);
-	for (int i = 0; i < length; i++) {
-		arr[i] = 0;
-	}
-	return arr;
-}
-
-bool* zero_bool_alloc(const int length) {
-	bool* arr = bool_alloc(length);
-	for (int i = 0; i < length; i++) {
-		arr[i] = false;
-	}
-	return arr;
-}
-
-int** zero_int_mat(const int m, const int n) {
-	int** mat = int_mat(m, n);
-	for (int i = 0; i < m; i++) {
-		for (int j = 0; j < n; j++) {
-			mat[i][j] = 0;
-		}
-	}
-	return mat;
 }
 
 // Further functions
