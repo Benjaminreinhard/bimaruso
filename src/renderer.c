@@ -14,6 +14,9 @@ void render_cur_board(State s) {
 			case X: case M:
 				printf("%s ", "\u25CF");
 				break;
+			case D:
+				printc(D);
+				break;
 			}
 		}
 		printf("\n");

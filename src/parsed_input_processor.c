@@ -153,35 +153,6 @@ void fill_cur_board_per_cell(const int i, const int j, State s) {
 	}
 }
 
-void fill_x_cell_corners_with_o(const int i, const int j, State s) {
-	if (s.cur_board[i][j] != X) { return; }
-
-	bool cond;
-	if (i-1 >= 0 && j-1 >= 0) {
-		cond = s.cur_board[i-1][j-1] != O && s.cur_board[i-1][j-1] != D;
-		cond_err(cond, "A ship is too close to another one.");
-		s.cur_board[i-1][j-1] = O;
-	}
-
-	if (i+1 <= s.m-1 && j-1 >= 0) {
-		cond = s.cur_board[i+1][j-1] != O && s.cur_board[i+1][j-1] != D;
-		cond_err(cond, "A ship is too close to another one.");
-		s.cur_board[i+1][j-1] = O;
-	}
-
-	if (i-1 >= 0 && j+1 <= s.n-1) {
-		cond = s.cur_board[i-1][j+1] != O && s.cur_board[i-1][j+1] != D;
-		cond_err(cond, "A ship is too close to another one.");
-		s.cur_board[i-1][j+1] = O;
-	}
-
-	if (i+1 <= s.m-1 && j+1 <= s.n-1) {
-		cond = s.cur_board[i+1][j+1] != O && s.cur_board[i+1][j+1] != D;
-		cond_err(cond, "A ship is too close to another one.");
-		s.cur_board[i+1][j+1] = O;
-	}
-}
-
 void initialize_cur_board(State s) {
 	for (int i = 0; i < s.m; i++) {
 		for (int j = 0; j < s.n; j++) {
@@ -192,12 +163,6 @@ void initialize_cur_board(State s) {
 	for (int i = 0; i < s.m; i++) {
 		for (int j = 0; j < s.n; j++) {
 			fill_cur_board_per_cell(i, j, s);
-		}
-	}
-
-	for (int i = 0; i < s.m; i++) {
-		for (int j = 0; j < s.n; j++) {
-			fill_x_cell_corners_with_o(i, j, s);
 		}
 	}
 }

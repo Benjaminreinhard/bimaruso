@@ -128,7 +128,7 @@ bool check_cur_shipcounts(State s) {
 	for (int j = 0; j < s.n; j++) {
 		at_ship = true;
 		ship_size = 0;
-		for (int i = 0; i < s.n; i++) {
+		for (int i = 0; i < s.m; i++) {
 			switch (s.cur_board[i][j]) {
 			case D:
 				at_ship = false;
@@ -188,8 +188,8 @@ bool minmax_rec(int i, int j, State s) {
 		return true;
 	}
 
-	int i_next = (j <= s.m-2) ? i : i+1;
-	int j_next = (j <= s.m-2) ? j+1 : 0;
+	int i_next = (j <= s.n-2) ? i : i+1;
+	int j_next = (j <= s.n-2) ? j+1 : 0;
 
 	if (s.cur_board[i][j] != D) {
 		return minmax_rec(i_next, j_next, s);
