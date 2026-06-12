@@ -78,7 +78,7 @@ bool check_cur_colnum(const int j, State s) {
 	return xm_count <= s.colnums[j] && o_count <= s.m - s.colnums[j];
 }
 
-void det_cur_shipcounts(State s) {
+bool check_cur_shipcounts(State s) {
 	for (int k = 0;;k++) {
 		if (s.cur_shipcounts[k] == -1) { break; }
 		s.cur_shipcounts[k] = 0;
@@ -109,6 +109,7 @@ void det_cur_shipcounts(State s) {
 						}
 
 						if (cond) {
+							if (s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size]) { return false; };
 							s.cur_shipcounts[ship_size]++;
 							ship_size = 0;
 							at_ship = false;
@@ -141,6 +142,7 @@ void det_cur_shipcounts(State s) {
 						cond = ship_size > 1;
 
 						if (cond) {
+							if (s.cur_shipcounts[ship_size] >= s.shipcounts[ship_size]) { return false; };
 							s.cur_shipcounts[ship_size]++;
 							ship_size = 0;
 							at_ship = false;
@@ -155,6 +157,8 @@ void det_cur_shipcounts(State s) {
 			}
 		}
 	}
+
+	return true;
 }
 
 bool* next_moves(const int i, const int j, State s) {
@@ -169,15 +173,9 @@ bool* next_moves(const int i, const int j, State s) {
 
 		moves[k] = moves[k] && check_cur_rownum(i, s);
 		moves[k] = moves[k] && check_cur_colnum(j, s);
-		
-		det_cur_shipcounts(s);
-		for (int l = 0;; l++) {
-			if (s.cur_shipcounts[l] == -1) { break; }
-			if (s.cur_shipcounts[l] > s.shipcounts[l]) { moves[k] = false; break; };
-		}
+		moves[k] = moves[k] && check_cur_shipcounts(s);
 
 		s.cur_board[i][j] = D;
-
 	}
 
 	// Return next moves
@@ -186,7 +184,6 @@ bool* next_moves(const int i, const int j, State s) {
 
 bool minmax_rec(int i, int j, State s) {
 	if (i == s.m) {
-		det_cur_shipcounts(s);
 		for (int k = 0;; k++) {
 			if (s.cur_shipcounts[k] == -1) { break; }
 			if (s.cur_shipcounts[k] != s.shipcounts[k]) { return false; };
